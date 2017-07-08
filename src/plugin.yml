@@ -1,0 +1,8 @@
+name: Trade
+version: 0.0.2.2
+author: Paragoumba
+main: fr.paragoumba.trade.Trade
+commands:
+  c:
+    description: Used to manage your shops
+    usage: /c recap test
