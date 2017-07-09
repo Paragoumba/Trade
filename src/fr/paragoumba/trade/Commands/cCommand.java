@@ -1,11 +1,15 @@
 package fr.paragoumba.trade.Commands;
 
+import com.sun.deploy.util.ArrayUtil;
+import fr.paragoumba.trade.DB;
 import fr.paragoumba.trade.Trade;
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -33,6 +37,15 @@ public class cCommand implements TabExecutor {
             if (strings.length > 0) {
 
                 if (strings[0].equalsIgnoreCase("recap")) {
+
+                    List<String> sales = DB.querySales(player);
+                    List<String> stock = DB.queryStock(player);
+
+                    player.sendMessage(ChatColor.GOLD + "Trade:");
+
+                    player.sendMessage("- Vos ventes: " + sales + ".");
+                    player.sendMessage("- Votre stock: " + stock + ".");
+                    player.sendMessage("- Vos revenus: " + stock);
 
                     return true;
 

@@ -27,7 +27,7 @@ public class onPlayerInteractsAtEntityEvent implements Listener {
         Player player = event.getPlayer();
         Entity entity = event.getRightClicked();
 
-        if (entity instanceof NPC && DB.) {
+        if (entity instanceof NPC && DB.traderExists(player)) {
 
             Inventory inventory = Bukkit.createInventory(null, InventoryType.CHEST, "Trade");
             ArrayList<ItemStack> items = new ArrayList<>();
