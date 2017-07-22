@@ -1,5 +1,5 @@
 name: Trade
-version: 0.0.2.2
+version: 0.3.2.7
 author: Paragoumba
 main: fr.paragoumba.trade.Trade
 commands:

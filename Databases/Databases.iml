@@ -7,7 +7,5 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="snakeyaml-1.18" level="application" />
-    <orderEntry type="library" name="spigot-api-1.11-R0.1-SNAPSHOT" level="application" />
   </component>
 </module>

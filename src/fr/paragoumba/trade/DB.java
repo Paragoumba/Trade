@@ -3,11 +3,14 @@ package fr.paragoumba.trade;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.yaml.snakeyaml.Yaml;
 
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 import java.util.logging.Level;
 
 import static fr.paragoumba.trade.Trade.plugin;
@@ -39,11 +42,11 @@ public class DB {
         }
     }
 
-    public static void updateStock(Player trader, String update) {
+    public static void updateStock(UUID uuid, String update) {
 
         try(Statement state = connection.createStatement()) {
 
-            state.executeUpdate("UPDATE Trade SET stock = '" + update + "' WHERE trader = '" + trader.getUniqueId() + "'");
+            state.executeUpdate("UPDATE Trade SET stock = '" + update + "' WHERE trader = '" + uuid + "'");
 
         } catch (Exception e) {
 
@@ -52,62 +55,54 @@ public class DB {
         }
     }
 
-    public static List<String> querySales(Player trader) {
+    public static HashMap<ItemStack, HashMap<Double, Integer>> querySales(UUID uuid) {
 
         try(Statement state = connection.createStatement();
-            ResultSet result = state.executeQuery("SELECT sales FROM Trade WHERE trader = '" + trader.getUniqueId() + "'")) {
+            ResultSet result = state.executeQuery("SELECT sales FROM Trade WHERE trader = '" + uuid + "'")) {
 
-            String sales = "";
-
-            while (result.next()){
-
-                sales = result.getString("sales");
-
-            }
-
-            return Arrays.asList(sales.substring(1, sales.length() - 1).split(","));
-
-        } catch (Exception e) {
-
-            e.printStackTrace();
-
-        }
-
-        return new ArrayList<>();
-    }
-
-    public static List<String> queryStock(Player trader) {
-
-        try(Statement state = connection.createStatement();
-            ResultSet result = state.executeQuery("SELECT stock FROM Trade WHERE trader = '" + trader.getUniqueId() + "'")) {
-
-            String stock = "";
-
-            while (result.next()){
-
-                stock = result.getString("stock");
-
-            }
-
-            return Arrays.asList(stock.substring(1, stock.length() - 1).split(","));
-
-        } catch (Exception e) {
-
-            e.printStackTrace();
-
-        }
-
-        return new ArrayList<>();
-    }
-
-    public static boolean traderExists(Player trader){
-
-        try(Statement state = connection.createStatement();
-            ResultSet result = state.executeQuery("SELECT trader FROM Trade WHERE trader = '" + trader.getUniqueId() + "'")) {
+            Yaml yaml = new Yaml();
 
             result.next();
 
-            return result.getString("trader").equals(trader.getUniqueId().toString());
+            return (HashMap<ItemStack, HashMap<Double, Integer>>) yaml.load(result.getString("sales"));
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+
+        }
+
+        return new HashMap<>();
+    }
+
+    public static List<ItemStack> queryStock(UUID uuid) {
+
+        try(Statement state = connection.createStatement();
+            ResultSet result = state.executeQuery("SELECT stock FROM Trade WHERE trader = '" + uuid + "'")) {
+
+            Yaml yaml = new Yaml();
+
+            result.next();
+
+            return (List<ItemStack>) yaml.load(result.getString("stock"));
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+
+        }
+
+        return new ArrayList<>();
+    }
+
+    public static boolean traderExists(UUID uuid){
+
+        try(Statement state = connection.createStatement();
+            ResultSet result = state.executeQuery("SELECT trader FROM Trade WHERE trader = '" + uuid + "'")) {
+
+            result.next();
+
+            return result.getString("trader").equals(uuid.toString());
 
         } catch (Exception e) {
 
@@ -118,7 +113,7 @@ public class DB {
         return false;
     }
 
-    public static void connect() {
+    static void connect() {
 
         try {
 
@@ -134,7 +129,7 @@ public class DB {
         }
     }
 
-    public static void disconnect() {
+    static void disconnect() {
 
         if (connection != null) {
 
@@ -143,7 +138,7 @@ public class DB {
                 connection.close();
                 Bukkit.getLogger().log(Level.WARNING, "Trade: Database disconnected.");
 
-            } catch (SQLException e) {
+            } catch (Exception e) {
 
                 Bukkit.getLogger().log(Level.WARNING, "Trade: Error in database disconnection.");
                 e.printStackTrace();
@@ -153,13 +148,13 @@ public class DB {
         }
     }
 
-    public static void reset() {
+    static void reset() {
 
         try (Statement state = connection.createStatement()) {
 
             state.executeUpdate("DELETE FROM Tickets");
 
-        } catch (SQLException e) {
+        } catch (Exception e) {
 
             e.printStackTrace();
 
