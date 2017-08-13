@@ -2,11 +2,12 @@ package fr.paragoumba.trade;
 
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.Configuration;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.yaml.snakeyaml.Yaml;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -29,11 +30,12 @@ public class DB {
     private static String login = config.getString("login");
     private static String password = config.getString("password");
 
-    public static void updateSales(Player trader, String update) {
+    public static void updateSales(UUID uuid, Object update) {
 
-        try(Statement state = connection.createStatement()) {
+        try(Statement state = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            ResultSet result = state.executeQuery("SELECT * FROM `Trade` WHERE trader='" + uuid + "'")) {
 
-            state.executeUpdate("UPDATE Trade SET sales = '" + update + "' WHERE trader = '" + trader.getUniqueId() + "'");
+            result.updateObject("sales", update);
 
         } catch (Exception e) {
 
@@ -42,11 +44,12 @@ public class DB {
         }
     }
 
-    public static void updateStock(UUID uuid, String update) {
+    public static void updateStock(UUID uuid, Object update) {
 
-        try(Statement state = connection.createStatement()) {
+        try(Statement state = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            ResultSet result = state.executeQuery("SELECT * FROM `Trade` WHERE trader='" + uuid + "'")) {
 
-            state.executeUpdate("UPDATE Trade SET stock = '" + update + "' WHERE trader = '" + uuid + "'");
+            result.updateObject("stock", update);
 
         } catch (Exception e) {
 
@@ -60,11 +63,11 @@ public class DB {
         try(Statement state = connection.createStatement();
             ResultSet result = state.executeQuery("SELECT sales FROM Trade WHERE trader = '" + uuid + "'")) {
 
-            Yaml yaml = new Yaml();
-
             result.next();
 
-            return (HashMap<ItemStack, HashMap<Double, Integer>>) yaml.load(result.getString("sales"));
+            Object r = result.getObject("sales");
+
+            return (HashMap<ItemStack, HashMap<Double, Integer>>) r;
 
         } catch (Exception e) {
 
@@ -80,11 +83,9 @@ public class DB {
         try(Statement state = connection.createStatement();
             ResultSet result = state.executeQuery("SELECT stock FROM Trade WHERE trader = '" + uuid + "'")) {
 
-            Yaml yaml = new Yaml();
-
             result.next();
 
-            return (List<ItemStack>) yaml.load(result.getString("stock"));
+            return (List<ItemStack>) result.getObject("stock");
 
         } catch (Exception e) {
 
@@ -148,7 +149,7 @@ public class DB {
         }
     }
 
-    static void reset() {
+    private static void reset() {
 
         try (Statement state = connection.createStatement()) {
 

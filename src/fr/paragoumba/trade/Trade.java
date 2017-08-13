@@ -23,6 +23,7 @@ public class Trade extends JavaPlugin {
         File config = new File(getDataFolder(), "config.yml");
 
         try {
+
             if (!config.exists()) {
 
                 getConfig().options().copyDefaults(true);
@@ -30,6 +31,7 @@ public class Trade extends JavaPlugin {
                 saveDefaultConfig();
 
             }
+
         } catch (Exception e) {
 
             e.printStackTrace();

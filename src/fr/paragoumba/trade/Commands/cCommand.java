@@ -97,14 +97,13 @@ public class cCommand implements TabExecutor {
 
                 } else if (strings[0].equalsIgnoreCase("test")) {
 
-                    Yaml yaml = new Yaml();
-
                     System.out.println("Welcome to Shop Simulator 2017.");
 
                     HashMap<ItemStack, HashMap<Double, Integer>> sales = new HashMap<>();
                     HashMap<Double, Integer> prices = new HashMap<>();
 
                     System.out.println(sales);
+                    DB.updateSales(player.getUniqueId(), sales);
 
                     ItemStack item = new ItemStack(Material.ANVIL);
 
@@ -120,7 +119,7 @@ public class cCommand implements TabExecutor {
 
                     System.out.println(sales);
 
-                    System.out.println((HashMap<ItemStack, HashMap<Double, Integer>>) yaml.load(yaml.dump(sales)));
+                    System.out.println(DB.querySales(player.getUniqueId()));
 
                 } else {
 
